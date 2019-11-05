@@ -1,10 +1,10 @@
 
 #include "ff14/ff.h"
-#include "include/hardware.h"
-#include "include/hardware_sdcard.h"
-#include "include/lcd.h"
-#include "include/util.h"
-#include "include/sdcard.h"
+#include "hardware.h"
+#include "hardware_sdcard.h"
+#include "lcd.h"
+#include "util.h"
+#include "sdcard.h"
 
 unsigned char *nothing();
 
