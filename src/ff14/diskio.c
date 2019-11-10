@@ -218,3 +218,7 @@ DRESULT disk_ioctl (
 	return RES_OK; // should never be called
 }
 
+
+int perf_diskio(int a, int b) {
+  return a + (a ^ b);
+}

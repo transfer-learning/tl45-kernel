@@ -34,7 +34,7 @@ volatile int a = 0;
 
 
 #define SCOMP(i) (*((volatile int *) (0x1000400 + (i) * 4)))
-#define SONAREN SCOMP(0)
+#define SONAREN SCOMP(0xB2)
 #define SONAR_READ(x) SCOMP(0xA8 + (x))
 
 void collect_data() {
@@ -44,17 +44,30 @@ void collect_data() {
 
   lcd_flash("Colllecting:");
 
-  while (SWITCHES&1 || 1) {
+  volatile int *my_mem_dump = 1024 * 1024;
 
-    int x = SONAR_READ(0);
-    int r = sprint_int(foo, x);
+  int num_samples = 200;
+
+  while ((SWITCHES&1) && num_samples >= 0) {
+
+    SEG = num_samples;
+    int r = sprint_int(foo, num_samples);
     foo[r] = '\n';
     foo[r + 1] = '\0';
-
     lcd_puts(foo);
-    SEG = x;
 
+    for (int i = 0; i < 8; i++) {
+      int x = SONAR_READ(i);
+
+      // SEG = x;
+      *(my_mem_dump++) = x;
+    }
+
+    sad_wait(100);
+    num_samples--;
   }
+
+  lcd_flash("collection done");
 
 }
 
@@ -66,12 +79,12 @@ void main() {
 
   lcd_puts("LCD init\n");
 
-  if (sdcard_init()) {
-    lcd_flash("SD card init\n");
-  } else {
-    lcd_flash("No SD card\n");
-    sad_wait(1000);
-  }
+//  if (sdcard_init()) {
+//    lcd_flash("SD card init\n");
+//  } else {
+//    lcd_flash("No SD card\n");
+//    sad_wait(1000);
+//  }
 
   // FATFS my_fs;
 
@@ -91,7 +104,8 @@ void main() {
 
 
   halt();
-
-
 }
 
+int main_unused(int a, int b) {
+  return a + (a ^ b);
+}
