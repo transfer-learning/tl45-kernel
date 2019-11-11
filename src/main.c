@@ -77,6 +77,15 @@ void main() {
 
   SEG = 0xdeadbeef;
 
+  SONAREN = 0x1;
+
+  SCOMP(0x83) = 128;
+  SCOMP(0x88) = -128;
+
+//while(1) {
+//  SEG = SONAR_READ(0);
+//}
+
   lcd_puts("LCD init\n");
 
 //  if (sdcard_init()) {
