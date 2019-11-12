@@ -1,3 +1,4 @@
+#include <math.h>
 
 #include "ff14/ff.h"
 #include "hardware.h"
@@ -5,6 +6,7 @@
 #include "lcd.h"
 #include "util.h"
 #include "sdcard.h"
+#include "fxp_math.h"
 
 unsigned char *nothing();
 
@@ -32,21 +34,16 @@ unsigned char *t = "abcdefghijk";
 
 volatile int a = 0;
 
-
-#define SCOMP(i) (*((volatile int *) (0x1000400 + (i) * 4)))
-#define SONAREN SCOMP(0)
-#define SONAR_READ(x) SCOMP(0xA8 + (x))
-
 void collect_data() {
 
   char foo[20];
-  SONAREN = 0xFF;
+  sonar_enable(0xFF);
 
   lcd_flash("Colllecting:");
 
   while (SWITCHES&1 || 1) {
 
-    int x = SONAR_READ(0);
+    int x = sonar_read(0);
     int r = sprint_int(foo, x);
     foo[r] = '\n';
     foo[r + 1] = '\0';
@@ -65,6 +62,10 @@ void main() {
   SEG = 0xdeadbeef;
 
   lcd_puts("LCD init\n");
+
+  if (fxp_mul(12345, 6789) < 10) {
+    lcd_flash("HI");
+  }
 
   if (sdcard_init()) {
     lcd_flash("SD card init\n");
