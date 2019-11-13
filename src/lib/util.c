@@ -32,6 +32,7 @@ int sprint_int(char *arr, int num) {
   while (i-- > 0) {
     *arr++ = foo[i];
   }
+  *arr = 0;
 
   return n;
 }
