@@ -17,4 +17,8 @@ typedef unsigned long long uint64_t;
 
 typedef unsigned int size_t;
 
+#define BOOL unsigned int
+#define TRUE 1
+#define FALSE 0
+
 #endif //_LIBCPP_STDINT_H
