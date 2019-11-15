@@ -29,7 +29,7 @@ unsigned idiv(unsigned n, unsigned d);
 int main() {
 
   while(1) {
-    PRNT(0, RECV(0));
+    PRNT(0, RECV(0) / RECV(0));
   }
 
   int a = RECV(0);

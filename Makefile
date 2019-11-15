@@ -17,7 +17,7 @@ CLANG=./toolchain/bin/clang
 # _OBJS = crt0.o lib/lcd.o lib/soft_impl.o lib/util.o main.o
 # _OBJS = crt0.o lib/soft_impl.o sha1.o
 # _OBJS = crt0.o lib/soft_impl.o scomp.o
-_OBJS = crt0.o div_test.o
+_OBJS ?= crt0.o lib/soft_impl.o div_test.o
 
 ODIR=obj
 CFLAGS=-Wall -Iinclude
@@ -49,3 +49,5 @@ deploy: build
 simulate: build
 	hardware-src/verilator/build/sim_tl45_io $(ODIR)/a.out
 
+clean:
+	rm -rf obj/*

@@ -76,7 +76,7 @@ def read_ack(ser, address):
             raise ValueError('didnt get ACK')
 
     ack_address, junk, mem = response.strip().partition('R')
-    if (len(ack_address) != 9):
+    if len(ack_address) != 9:
         time.sleep(0.5)
         return read_ack(ser, address)
 
@@ -130,7 +130,7 @@ argp.add_argument('--base', type=int, nargs='?', default=0)
 argp.add_argument('file', type=str, nargs='?')
 args = argp.parse_args()
 
-with serial.Serial(serial_ifs[0], 115200, timeout=0.5) as ser:
+with serial.Serial(serial_ifs[0], 115200, timeout=0.01) as ser:
     print('Serial Name:', ser.name)
 
     ser.reset_input_buffer()
