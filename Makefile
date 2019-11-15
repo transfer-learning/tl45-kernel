@@ -33,8 +33,8 @@ $(ODIR)/crt0.o: crt0.s
 $(ODIR)/%.o: src/%.c $(DEPS)
 	mkdir -p $(ODIR)/ff14
 	mkdir -p $(ODIR)/lib
-	$(CLANG) --target=tl45-unknown-none -fintegrated-as -c -v $(CFLAGS) $< -o $@
-	$(CLANG) --target=tl45-unknown-none -fintegrated-as -c -v $(CFLAGS) $< -S -o $@.s
+	$(CLANG) --target=tl45-unknown-none -fintegrated-as -O3 -c -v $(CFLAGS) $< -o $@
+	$(CLANG) --target=tl45-unknown-none -fintegrated-as -O3 -c -v $(CFLAGS) $< -S -o $@.s
 
 $(ODIR)/a.out: $(OBJS)
 	$(LLD) -flavor gnu --oformat binary -image-base 0 $^ -o $@
