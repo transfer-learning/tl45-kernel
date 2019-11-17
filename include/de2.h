@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+void reset_encoders();
+
 int left_encoder_read();
 int right_encoder_read();
 

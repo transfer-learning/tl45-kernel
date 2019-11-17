@@ -1,6 +1,9 @@
 #include "linalg_math.h"
 
 void mat_mul(fxp_t *A, fxp_t *B, fxp_t *out, int L, int N, int M) {
+    *((fxp_t *)0x100000) = L;
+    *((fxp_t *)0x100004) = N;
+    *((fxp_t *)0x100008) = M;
     for (int i = 0; i < L; i++) {
         for (int k = 0; k < M; k++) {
             entry(out, L, M, i, k) = 0;
@@ -52,7 +55,9 @@ void mat2x2_inv(fxp_t *A, fxp_t *out) {
     fxp_t A10 = entry(A, 2, 2, 1, 0);
     fxp_t A11 = entry(A, 2, 2, 1, 1);
 
-    fxp_t invdet = fxp_div(int2fxp(1), fxp_mul(A00, A11) - fxp_mul(A10, A01));
+    fxp_t invdet = fxp_idiv(int2fxp(1), fxp_mul(A00, A11) - fxp_mul(A10, A01));
+    *((fxp_t *)0x100004) = invdet;
+    *((fxp_t *)0x100008) = fxp_mul(A00, A11) - fxp_mul(A10, A01);
     entry(out, 2, 2, 0, 0) = fxp_mul(invdet, A11);
     entry(out, 2, 2, 1, 1) = fxp_mul(invdet, A00);
     entry(out, 2, 2, 1, 0) = -fxp_mul(invdet, A10);

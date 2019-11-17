@@ -53,7 +53,7 @@ void closest_point_line(line_segment_t *line, fxp_t *point, fxp_t *out_pose) {
     fxp_t sq_norm = squared_distance(line->start, line->end);
 
     // Take the dot product and write out the projection.
-    fxp_t coeff = fxp_div(inner_product(point_relative, end_relative, 2), sq_norm);
+    fxp_t coeff = fxp_idiv(inner_product(point_relative, end_relative, 2), sq_norm);
     out_pose[0] = line->start[0] + fxp_mul(coeff, end_relative[0]);
     out_pose[1] = line->start[1] + fxp_mul(coeff, end_relative[1]);
     out_pose[2] = line->angle;
@@ -65,7 +65,7 @@ void closest_point_arc(arc_t *arc, fxp_t *point, fxp_t *out) {
     fxp_t radius_current = fxp_sqrt(squared_distance(point, arc->center));
 
     // Multiply the current point by the ratio of the actual radius to the current radius
-    fxp_t coeff = fxp_div(arc->radius, radius_current);
+    fxp_t coeff = fxp_idiv(arc->radius, radius_current);
 
     out[0] = arc->center[0] + fxp_mul(coeff, point[0] - arc->center[0]);
     out[1] = arc->center[1] + fxp_mul(coeff, point[1] - arc->center[1]);

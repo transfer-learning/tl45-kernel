@@ -19,14 +19,15 @@ void init(state_t *state) {
     state->pose[0] = state->pose[1] = state->pose[2];
 }
 
-void predict(state_t *state, encoders_t *encoder_diffs) {
+void predict(state_t *state, encoders_t *encoders) {
     fxp_t angle = state->pose[2];
     fxp_t s = fxp_sin(angle);
     fxp_t c = fxp_cos(angle);
 
     // encoders[i] is an integer, so we don't want fxp_mul
-    fxp_t left = encoder_diffs->left * TICK;
-    fxp_t right = encoder_diffs->right * TICK;
+    fxp_t left = (encoders->left - state->last_encoders.left) * TICK;
+    fxp_t right = (encoders->right - state->last_encoders.right) * TICK;
+    state->last_encoders = *encoders;
 
     fxp_t forwards = (left + right) / 2;
     fxp_t angular = fxp_mul(right - left, ROBOT_WHEELBASE_INV);

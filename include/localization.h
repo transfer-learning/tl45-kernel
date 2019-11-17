@@ -9,7 +9,8 @@
 typedef struct {
     vec3_t pose;
     mat3x3_t covariance;
+    encoders_t last_encoders;
 } state_t;
 
-void predict(state_t *state, encoders_t *encoder_diffs);
+void predict(state_t *state, encoders_t *encoders);
 void update(state_t *state, measurement_t *meas);

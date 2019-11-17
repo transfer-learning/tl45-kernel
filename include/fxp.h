@@ -13,7 +13,8 @@ extern fxp_t sluti[1024];
 int32_t isqrt(int32_t a);
 
 fxp_t fxp_mul(fxp_t a, fxp_t b);
-fxp_t fxp_div(fxp_t a, fxp_t b);
+fxp_t fxp_idiv(fxp_t a, fxp_t b);
+fxp_t fxp_udiv(fxp_t a, fxp_t b);
 fxp_t fxp_add(fxp_t a, fxp_t b);
 fxp_t fxp_sub(fxp_t a, fxp_t b);
 fxp_t fxp_sin(fxp_t a);

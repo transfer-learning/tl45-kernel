@@ -32,13 +32,23 @@ fxp_t fxp_mul(fxp_t a, fxp_t b) {
     return ((a_hi * b_hi) << 16) + (a_hi * b_lo + a_lo * b_hi) + ((a_lo * b_lo) >> 16);
 }
 
-fxp_t fxp_div(fxp_t a, fxp_t b) {
-    volatile int int_part = a / b;
-    fxp_t rem = a - int_part * b;
-    if (b >> 8) {
-        return (int_part << 16) + (rem << 8) / (b >> 8);
-    }
-    return 0;
+// Only works for positive numbers!!!
+fxp_t fxp_udiv(fxp_t a, fxp_t b) {
+    /* fxp_t result = 0; */
+    /* __builtin_clz(a); */
+    /* while (a) { */
+    /*     fxp_t q = a / b; */
+    /*     a -= q * b; */
+    /*     a *= 2; */
+    /*     result = result * 2 + q; */
+    /* } */
+}
+
+fxp_t fxp_idiv(fxp_t a, fxp_t b) {
+    /* fxp_t result = 0; */
+    /* while (a) { */
+
+    /* } */
 }
 
 fxp_t fxp_add(fxp_t a, fxp_t b) {
@@ -50,7 +60,7 @@ fxp_t fxp_sub(fxp_t a, fxp_t b) {
 }
 
 fxp_t fxp_sin(fxp_t a) {
-    fxp_t rotations = fxp_div(a, to_fxp(2 * 3.14159265359));
+    fxp_t rotations = fxp_mul(a, to_fxp(1 / (2 * 3.14159265359)));
     int16_t lookup = rotations & ((1 << 16) - 1);
     lookup >>= 6;
     return sluti[lookup & ((1 << 10) - 1)];

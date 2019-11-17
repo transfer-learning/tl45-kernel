@@ -10,8 +10,7 @@ CLANG=./toolchain/bin/clang
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Advanced
-_OBJS = crt0.o lib/sdcard.o lib/lcd.o lib/soft_impl.o lib/util.o ff14/diskio.o ff14/ff.o de2.o main.o fxp.o luts.o
-
+_OBJS = crt0.o lib/lcd.o lib/soft_impl.o lib/util.o de2.o main.o fxp.o luts.o localization.o linalg_math.o motion.o string.o # ff14/diskio.o ff14/ff.o lib/sdcard.o
 ODIR=obj
 CFLAGS=-Wall -Iinclude
 
