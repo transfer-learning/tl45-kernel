@@ -15,9 +15,9 @@ CLANG=./toolchain/bin/clang
 # Advanced
 # _OBJS = crt0.o lib/sdcard.o lib/lcd.o lib/soft_impl.o lib/util.o ff14/diskio.o ff14/ff.o main.o
 # _OBJS = crt0.o lib/lcd.o lib/soft_impl.o lib/util.o main.o
-# _OBJS = crt0.o lib/soft_impl.o sha1.o
+_OBJS = crt0.o lib/soft_impl.o lib/util.o quicksort.o
 # _OBJS = crt0.o lib/soft_impl.o scomp.o
-_OBJS ?= crt0.o lib/soft_impl.o div_test.o
+# _OBJS ?= crt0.o lib/soft_impl.o lib/util.o div_test.o
 
 ODIR=obj
 CFLAGS=-Wall -Iinclude
@@ -27,6 +27,10 @@ OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 .PHONY: default deploy build
 
 $(ODIR)/crt0.o: crt0.s
+	mkdir -p $(ODIR)
+	$(LLVM_MC) --filetype obj -triple=tl45-unknown-unknown $< -o $@
+
+$(ODIR)/testcase.o: testcase.s
 	mkdir -p $(ODIR)
 	$(LLVM_MC) --filetype obj -triple=tl45-unknown-unknown $< -o $@
 

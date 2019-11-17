@@ -7,7 +7,7 @@ extern fxp_t sluti[1024];
 
 #define M_PI 3.14159265359
 
-#define int2fxp(x) (x << 16)
+#define int2fxp(x) ((x) << 16)
 #define to_fxp(f) ((fxp_t) ((f) * (1 << 16) + 0.5))
 
 int32_t isqrt(int32_t a);

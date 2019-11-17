@@ -2,6 +2,8 @@
 // Created by Will Gulian on 11/14/19.
 //
 
+#include "util.h"
+
 typedef unsigned su_int;
 typedef int si_int;
 
@@ -23,13 +25,68 @@ int read_int() {
 #define RECV(i) VER(i)
 #endif
 
+#define WHEEL_LEFT VER(5)
+#define WHEEL_RIGHT VER(6)
+
+#define ENCODER_LEFT WHEEL_LEFT
+#define ENCODER_RIGHT WHEEL_RIGHT
+
+#define SONAREN VER(7)
+#define SONAR_READ(x) VER(10 + (x))
+
 unsigned idiv(unsigned n, unsigned d);
 
+void sim_wait(int x) {
+  VER(3) = x; // set wait time
+  VER(3); // wait
+}
+
+#if 1
 
 int main() {
 
+  SONAREN = 0x21;
+
+  WHEEL_LEFT = -40;
+  WHEEL_RIGHT = 40;
+
   while(1) {
-    PRNT(0, RECV(0) / RECV(0));
+//    RECV(0);
+
+//  WHEEL_LEFT = 0;
+//  WHEEL_RIGHT = 120;
+//
+
+    while (SONAR_READ(5) > 0x400);
+
+    // start rotate
+
+    int x = ENCODER_RIGHT;
+
+    while (-(ENCODER_RIGHT - x) < 24000) {
+      WHEEL_LEFT = -150;
+      WHEEL_RIGHT = 20;
+    }
+
+
+    WHEEL_LEFT = -20;
+    WHEEL_RIGHT = 150;
+
+    while (SONAR_READ(5) < 0x400);
+
+//    if (SONAR_READ(1) < 0x400 || SONAR_READ(6) < 0x400) {
+//      WHEEL_LEFT = 0;
+//      WHEEL_RIGHT = 0;
+//    } else {
+//
+//      WHEEL_LEFT = -150;
+//      WHEEL_RIGHT = 150;
+//    }
+
+
+    // sim_wait(50);
+
+    // PRNT(0, RECV(0) / RECV(0));
   }
 
   int a = RECV(0);
@@ -40,44 +97,30 @@ int main() {
 
 }
 
-unsigned idiv(unsigned n, unsigned d) {
-  const unsigned n_uword_bits = sizeof(su_int) * 8;
-  su_int q;
-  su_int r;
-  unsigned sr;
-  // special cases
-  if (d == 0)
-    return 0; // ?!
-  if (n == 0)
-    return 0;
-  sr = __builtin_clz(d) - __builtin_clz(n);
-  // 0 <= sr <= n_uword_bits - 1 or sr large
-  if (sr > n_uword_bits - 1) // d > r
-    return 0;
-  if (sr == n_uword_bits - 1) // d == 1
-    return n;
-  ++sr;
-  // 1 <= sr <= n_uword_bits - 1
-  // Not a special case
-  q = n << (n_uword_bits - sr);
-  r = n >> sr;
-  su_int carry = 0;
-  for (; sr > 0; --sr) {
 
-    // r:q = ((r:q)  << 1) | carry
-    r = (r << 1) | (q >> (n_uword_bits - 1));
-    q = (q << 1) | carry;
+#else
 
-    // carry = 0;
-    // if (r.all >= d.all)
-    // {
-    //      r.all -= d.all;
-    //      carry = 1;
-    // }
-    const si_int s = (si_int)(d - r - 1) >> (n_uword_bits - 1);
-    carry = s & 1;
-    r -= d & s;
+int main() {
+
+  while(1) {
+
+    fxp_t a = (fxp_t) RECV(0);
+    fxp_t b = (fxp_t) RECV(0);
+
+    fxp_t c = fxp_div(a, b);
+
+    PRNT(0,c);
+
+    // PRNT(0, RECV(0) / RECV(0));
   }
-  q = (q << 1) | carry;
-  return q;
+
+  int a = RECV(0);
+  int b = 1363825137;
+  int c = idiv(a, b);
+
+  PRNT(0, c);
+
 }
+
+
+#endif

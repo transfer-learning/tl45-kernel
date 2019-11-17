@@ -13,9 +13,9 @@ int main() {
     // To read multiple arguments, call RECV() multiple times.
 
     fxp_t a = (fxp_t) RECV(0);
-    // fxp_t b = int2fxp(RECV(0));
+    fxp_t b = (fxp_t) RECV(0);
 
-    fxp_t c = fxp_div(int2fxp(10), a);
+    fxp_t c = fxp_div(a, b);
 
     // fxp_t c = fxp_mul(a, b);
 

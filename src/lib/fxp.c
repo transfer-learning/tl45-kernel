@@ -1,5 +1,9 @@
 #include "stdint.h"
 #include "fxp.h"
+#include "stddef.h"
+#include "divmnu.h"
+
+#include "verilator.h"
 
 extern int32_t sluti[1024];
 
@@ -12,12 +16,45 @@ fxp_t fxp_mul(fxp_t a, fxp_t b) {
     return ((a_hi * b_hi) << 16) + (a_hi * b_lo + a_lo * b_hi) + ((a_lo * b_lo) >> 16);
 }
 
-fxp_t fxp_div(fxp_t a, fxp_t b) {
-    int int_part = a / b;
-    fxp_t rem = a - int_part * b;
-    if (b >> 8) {
-        return (int_part << 16) + (rem << 8) / (b >> 8);
-    }
+
+
+fxp_t fxp_div(fxp_t a_, fxp_t b_) {
+  unsigned short u[4];
+  unsigned short v[2];
+  unsigned short q[4];
+
+  unsigned int a = (unsigned) a_;
+  unsigned int b = (unsigned) b_;
+
+  BOOL flip_sign = (a & 0x80000000) ^ (b & 0x80000000);
+  a &= ~0x80000000;
+  b &= ~0x80000000;
+
+  u[0] = 0;
+  u[1] = a & 0xffff;
+  u[2] = (a >> 16) & 0xffff;
+  u[3] = 0;
+
+  v[0] = b & 0xffff;
+  v[1] = (b >> 16) & 0xffff;
+
+  if (divmnu(q, NULL, u, v, 3, v[1] != 0 ? 2 : 1)) {
+    // error
+    return 0;
+  }
+
+  unsigned c = ((unsigned )q[0]) | ((unsigned )(q[1] << 16));
+  if (flip_sign) {
+    c |= 0x80000000;
+  }
+
+  return (fxp_t) c;
+
+//    int int_part = a / b;
+//    fxp_t rem = a - int_part * b;
+//    if (b >> 8) {
+//        return (int_part << 16) + (rem << 8) / (b >> 8);
+//    }
     return 0;
 }
 
