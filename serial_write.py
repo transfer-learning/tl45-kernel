@@ -124,9 +124,12 @@ def dump_raw(ser, arr, base=0):
     for i in range(0, len(arr)):
         write_ack(ser, base + i * 4, arr[i], verify=True)
 
+def auto_int(x):
+        return int(x, 0)
+
 argp = argparse.ArgumentParser()
 argp.add_argument('--dump', type=int, nargs='?')
-argp.add_argument('--base', type=int, nargs='?', default=0)
+argp.add_argument('--base', type=auto_int, nargs='?', default=0)
 argp.add_argument('file', type=str, nargs='?')
 args = argp.parse_args()
 
@@ -160,6 +163,7 @@ with serial.Serial(serial_ifs[0], 115200, timeout=0.01) as ser:
     # ]
 
     if args.dump:
+        print('BASE =', hex(args.base))
         write = open('dump.out', 'wb')
         for i in range(0, args.dump, 4):
             val = read_ack(ser, args.base + i)

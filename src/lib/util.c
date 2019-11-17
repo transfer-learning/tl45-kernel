@@ -49,6 +49,16 @@ void *memcpy(void *dst, const void *src, int n) {
 }
 
 
+void *memset(void *dst, char c, int n) {
+  void *orig_dst = dst;
+
+  for (int i = 0; i < n; i++) {
+    ((char *) dst)[i] = c;
+  }
+
+  return orig_dst;
+}
+
 // TODO this function cannot be called, causes decode_err
 int pref_utilf(int a, int b) {
   return a + (b ^ a);
