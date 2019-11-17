@@ -9,4 +9,6 @@ void sad_wait(int ms);
 
 int sprint_int(char *arr, int num);
 
+void *memcpy(void *dst, const void *src, int n);
+
 #endif //SIM_TL45_UTIL_H

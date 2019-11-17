@@ -30,6 +30,10 @@ $(ODIR)/crt0.o: crt0.s
 	mkdir -p $(ODIR)
 	$(LLVM_MC) --filetype obj -triple=tl45-unknown-unknown $< -o $@
 
+$(ODIR)/testcase.o: testcase.s
+	mkdir -p $(ODIR)
+	$(LLVM_MC) --filetype obj -triple=tl45-unknown-unknown $< -o $@
+
 $(ODIR)/%.o: src/%.c $(DEPS)
 	mkdir -p $(ODIR)/ff14
 	mkdir -p $(ODIR)/lib

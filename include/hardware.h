@@ -17,7 +17,6 @@
 #define SD_FIFO_B (*((volatile int *) 0x100002c))
 
 
-
 #define VER(i) (*((volatile int *) (0x13fc000 + (i) * 4)))
 #define VER0 VER(0)
 #define VER1 VER(1)

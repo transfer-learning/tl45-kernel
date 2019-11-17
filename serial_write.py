@@ -76,7 +76,7 @@ def read_ack(ser, address):
             raise ValueError('didnt get ACK')
 
     ack_address, junk, mem = response.strip().partition('R')
-    if (len(ack_address) != 9):
+    if len(ack_address) != 9:
         time.sleep(0.5)
         return read_ack(ser, address)
 
@@ -126,10 +126,11 @@ def dump_raw(ser, arr, base=0):
 
 argp = argparse.ArgumentParser()
 argp.add_argument('--dump', type=int, nargs='?')
+argp.add_argument('--base', type=int, nargs='?', default=0)
 argp.add_argument('file', type=str, nargs='?')
 args = argp.parse_args()
 
-with serial.Serial(serial_ifs[0], 115200, timeout=0.5) as ser:
+with serial.Serial(serial_ifs[0], 115200, timeout=0.01) as ser:
     print('Serial Name:', ser.name)
 
     ser.reset_input_buffer()
@@ -161,7 +162,7 @@ with serial.Serial(serial_ifs[0], 115200, timeout=0.5) as ser:
     if args.dump:
         write = open('dump.out', 'wb')
         for i in range(0, args.dump, 4):
-            val = read_ack(ser, i)
+            val = read_ack(ser, args.base + i)
             for j in range(3, -1, -1):
                 write.write(struct.pack('B', (val >> (j*8) & 0xFF)))
         write.flush()

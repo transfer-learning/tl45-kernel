@@ -6867,3 +6867,6 @@ FRESULT f_setcp (
 }
 #endif	/* FF_CODE_PAGE == 0 */
 
+int perf_ff(int a, int b) {
+  return a + (a ^ b);
+}

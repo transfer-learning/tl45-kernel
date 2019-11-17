@@ -2,6 +2,7 @@
 // Created by Will Gulian on 11/3/19.
 //
 
+#include <lcd.h>
 #include "hardware.h"
 #include "hardware_sdcard.h"
 #include "util.h"
@@ -92,9 +93,10 @@ static int sdcard_do_init() {
 
     dev_busy = SD_CMD & 1;
     max_count++;
-  } while (dev_busy && max_count < 12);
+  } while (dev_busy && max_count < 50);
 
   if (dev_busy) {
+    lcd_flash("");
     return 0;
   }
 
@@ -113,15 +115,15 @@ static int sdcard_do_init() {
 
   // SD - Read CSD
 
-//  int CSD[4];
-//  SD_DATA = 0;
-//  SD_CMD = (SDFIFOOP|SDCMD)+9;
-//  SDWAITWHILEBUSY;
-//  for (int i = 0; i < 4; i++)
-//    CSD[i] = SD_FIFO_A;
-//
-//
-//  SEG = (CSD[2] >> 16) | (CSD[1] << 16);
+  int CSD[4];
+  SD_DATA = 0;
+  SD_CMD = (SDFIFOOP|SDCMD)+9;
+  SDWAITWHILEBUSY;
+  for (int i = 0; i < 4; i++)
+    CSD[i] = SD_FIFO_A;
+
+
+  SEG = (CSD[2] >> 16) | (CSD[1] << 16);
 
   return 1;
 }
@@ -129,7 +131,7 @@ static int sdcard_do_init() {
 
 int sdcard_init() {
 
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 30; i++) {
     if (sdcard_do_init()) {
       return 1;
     }

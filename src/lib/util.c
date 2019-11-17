@@ -32,8 +32,20 @@ int sprint_int(char *arr, int num) {
   while (i-- > 0) {
     *arr++ = foo[i];
   }
+  *arr = 0;
 
   return n;
+}
+
+
+void *memcpy(void *dst, const void *src, int n) {
+  void *orig_dst = dst;
+
+  for (int i = 0; i < n; i++) {
+    ((char *) dst)[i] = ((char *) src)[i];
+  }
+
+  return orig_dst;
 }
 
 
