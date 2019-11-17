@@ -10,10 +10,14 @@ CLANG=./toolchain/bin/clang
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Basic 
-# _OBJS = crt0.o scomp.o
+ _OBJS = crt0.o lib/lcd.o lib/util.o simple.o 
 
 # Advanced
-_OBJS = crt0.o lib/sdcard.o lib/lcd.o lib/soft_impl.o lib/util.o ff14/diskio.o ff14/ff.o main.o
+# _OBJS = crt0.o lib/sdcard.o lib/lcd.o lib/soft_impl.o lib/util.o ff14/diskio.o ff14/ff.o main.o
+# _OBJS = crt0.o lib/lcd.o lib/soft_impl.o lib/util.o main.o
+# _OBJS = crt0.o lib/soft_impl.o sha1.o
+# _OBJS = crt0.o lib/soft_impl.o scomp.o
+# _OBJS ?= crt0.o lib/soft_impl.o div_test.o
 
 ODIR=obj
 CFLAGS=-Wall -Iinclude
@@ -40,4 +44,10 @@ default: deploy
 build: $(ODIR)/a.out
 
 deploy: build
-	python serial_write.py $(ODIR)/a.out
+	python2 serial_write.py $(ODIR)/a.out
+
+simulate: build
+	hardware-src/verilator/build/sim_tl45_io $(ODIR)/a.out
+
+clean:
+	rm -rf obj/*
