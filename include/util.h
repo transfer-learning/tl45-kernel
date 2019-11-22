@@ -8,7 +8,9 @@
 void sad_wait(int ms);
 
 int sprint_int(char *arr, int num);
+int sprint_8dig_hex(char *arr, unsigned int num);
 
-void *memcpy(void *dst, const void *src, int n);
+void wait(unsigned int ms);
+
 
 #endif //SIM_TL45_UTIL_H

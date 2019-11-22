@@ -1,18 +1,22 @@
 //
 // Created by Will Gulian on 11/3/19.
 //
+#include "hardware.h"
 
-volatile unsigned int g;
-
-void sad_wait(int ms) {
-  for (int i = 0; i < ms; i++) {
-    for (int j = 0; j < 1000; j++) {
-      g = j;
-    }
+int sprint_8dig_hex(char *arr, unsigned int num) {
+  for (unsigned int i = 0; i < 8; i++)
+  {
+    unsigned char m = (num >> ((7-i) * 4)) && 0xF;
+    arr[i] = (m < 10 ? '0' : 'A' - 10) + m;
   }
+  arr[8] = 0;
+  return 8;
 }
 
-unsigned __udivsi3(unsigned n, unsigned d);
+void wait(unsigned int ms) {
+  TIMER = 0;
+  while(TIMER < ms);
+}
 
 int sprint_int(char *arr, int num) {
   char foo[20];
@@ -35,31 +39,4 @@ int sprint_int(char *arr, int num) {
   *arr = 0;
 
   return n;
-}
-
-
-void *memcpy(void *dst, const void *src, int n) {
-  void *orig_dst = dst;
-
-  for (int i = 0; i < n; i++) {
-    ((char *) dst)[i] = ((char *) src)[i];
-  }
-
-  return orig_dst;
-}
-
-
-void *memset(void *dst, char c, int n) {
-  void *orig_dst = dst;
-
-  for (int i = 0; i < n; i++) {
-    ((char *) dst)[i] = c;
-  }
-
-  return orig_dst;
-}
-
-// TODO this function cannot be called, causes decode_err
-int pref_utilf(int a, int b) {
-  return a + (b ^ a);
 }

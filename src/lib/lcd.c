@@ -23,7 +23,7 @@ void __attribute__((noinline)) lcd_putc(char c) {
     force_newline = 0;
 
     LCD1 = 0b001 << 7;
-    sad_wait(10);
+    wait(10);
     return;
   }
 
@@ -38,28 +38,28 @@ void __attribute__((noinline)) lcd_putc(char c) {
 
       // rewrite top line
       LCD1 = 0b001 << 7;
-      sad_wait(4);
+      wait(4);
       for (int i = 0; i < 16; i++) {
         LCD2 = lol[0][i];
-        sad_wait(4);
+        wait(4);
       }
 
       LCD1 = (0b001 << 7) + 40;
-      sad_wait(4);
+      wait(4);
 
       for (int i = 0; i < 16; i++) {
         lol[1][i] = ' ';
         LCD2 = ' ';
-        sad_wait(4);
+        wait(4);
       }
 
       LCD1 = (0b001 << 7) + 40;
-      sad_wait(4);
+      wait(4);
 
       h = 1;
     } else {
       LCD1 = (0b001 << 7) + 40;
-      sad_wait(4);
+      wait(4);
     }
   }
 
@@ -70,7 +70,7 @@ void __attribute__((noinline)) lcd_putc(char c) {
 
   LCD2 = c;
   lol[h][w++] = c;
-  sad_wait(4);
+  wait(4);
 }
 
 void lcd_puts(const char *str) {
@@ -82,38 +82,32 @@ void lcd_puts(const char *str) {
 
 void lcd_flash(const char *str) {
   lcd_puts(str);
-  sad_wait(1000);
+  wait(1000);
   lcd_putc('\n');
 }
 
 void lcd_reset() {
   LCD1 = 0x3c;
-  sad_wait(10);
+  wait(10);
   LCD1 = 0x3c;
-  sad_wait(10);
+  wait(10);
 
   LCD1 = 0x3c;
-  sad_wait(10);
+  wait(10);
 
   LCD1 = 0x3c;
-  sad_wait(10);
+  wait(10);
   LCD1 = 0x0c;
-  sad_wait(10);
+  wait(10);
   LCD1 = 0x01;
-  sad_wait(10);
+  wait(10);
   LCD1 = 0x06;
-  sad_wait(10);
+  wait(10);
 
   // rewrite top line
   LCD1 = 0b001 << 7;
-  sad_wait(10);
+  wait(10);
 
   // reset terminal
   lcd_putc('\0');
-}
-
-
-// TODO this function cannot be called, causes decode_err
-int pref_lcd(int a, int b) {
-  return a + (b ^ a);
 }

@@ -8,8 +8,7 @@
 #include <stdint.h>
 
 /* memcmp, memset, strlen */
-
-static int strlen(int *t) {
+static int strlen(unsigned char *t) {
   int len = 0;
   while (t[len] != '\0') {
     len++;
@@ -17,19 +16,27 @@ static int strlen(int *t) {
   return len;
 }
 
-void memset(char *v, int c, unsigned int size) {
-  for (int i = 0; i < size; i++) {
-    *(v++) = c;
+void *memcpy(void *dst, const void *src, int n) {
+  void *orig_dst = dst;
+
+  for (int i = 0; i < n; i++) {
+    ((char *) dst)[i] = ((char *) src)[i];
   }
+
+  return orig_dst;
 }
 
-char *memcpy(char *dst, char *src, int size) {
-  char *orig = dst;
-  for (int i = 0; i < size; i++) {
-    *(dst++) = *(src++);
+
+void *memset(void *dst, char c, int n) {
+  void *orig_dst = dst;
+
+  for (int i = 0; i < n; i++) {
+    ((char *) dst)[i] = c;
   }
-  return orig;
+
+  return orig_dst;
 }
+
 
 static int memcmp(const int *s1, const int *s2, size_t size) {
   for (int i = 0; i < size; i++) {

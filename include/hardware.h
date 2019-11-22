@@ -16,6 +16,10 @@
 #define SD_FIFO_A (*((volatile int *) 0x1000028))
 #define SD_FIFO_B (*((volatile int *) 0x100002c))
 
+#define L_ENCODER (*((volatile int *) 0x01000020))
+#define R_ENCODER (*((volatile int *) 0x01000024))
+
+#define TIMER (*((volatile int *) 0x01000028))
 
 #define VER(i) (*((volatile int *) (0x13fc000 + (i) * 4)))
 #define VER0 VER(0)
