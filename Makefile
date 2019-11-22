@@ -10,7 +10,7 @@ CLANG=./toolchain/bin/clang
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Basic 
- _OBJS = crt0.o lib/lcd.o lib/util.o simple.o 
+_OBJS = crt0.o lib/lcd.o lib/util.o crypt/md2.o simple.o
 
 # Advanced
 # _OBJS = crt0.o lib/sdcard.o lib/lcd.o lib/soft_impl.o lib/util.o ff14/diskio.o ff14/ff.o main.o
@@ -37,6 +37,7 @@ $(ODIR)/testcase.o: testcase.s
 $(ODIR)/%.o: src/%.c $(DEPS)
 	mkdir -p $(ODIR)/ff14
 	mkdir -p $(ODIR)/lib
+	mkdir -p $(ODIR)/crypt
 	$(CLANG) --target=tl45-unknown-none -fintegrated-as -O3 -c -v $(CFLAGS) $< -o $@
 	$(CLANG) --target=tl45-unknown-none -fintegrated-as -O3 -c -v $(CFLAGS) $< -S -o $@.s
 
@@ -51,7 +52,7 @@ deploy: build
 	python2 serial_write.py $(ODIR)/a.out
 
 simulate: build
-	hardware-src/verilator/build/sim_tl45_io $(ODIR)/a.out
+	hardware-src/verilator/build/sim_tl45_comp $(ODIR)/a.out
 
 clean:
 	rm -rf obj/*
