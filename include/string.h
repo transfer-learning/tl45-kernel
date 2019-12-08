@@ -29,11 +29,13 @@ void *memcpy(void *dst, const void *src, int n) {
 
 void *memset(void *dst, char c, int n) {
   void *orig_dst = dst;
+  if (n > 8) {
 
-  for (int i = 0; i < n; i++) {
-    ((char *) dst)[i] = c;
+  } else {
+    for (int i = 0; i < n; i++) {
+      ((char *) dst)[i] = c;
+    }
   }
-
   return orig_dst;
 }
 

@@ -10,18 +10,6 @@ unsigned char *nothing();
 
 void halt();
 
-void memcpy(volatile unsigned char *dst, volatile unsigned char *src, int size) {
-  for (int i = 0; i < size; i++) {
-    *(dst++) = *(src++);
-  }
-}
-
-void memset(unsigned char *dst, unsigned char src, int size) {
-  for (int i = 0; i < size; i++) {
-    *(dst++) = src;
-  }
-}
-
 unsigned basic_pref[] = {0, 0, 0, 0};
 
 unsigned char *t = "abcdefghijk";

@@ -10,7 +10,7 @@ CLANG=./toolchain/bin/clang
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Basic 
-_OBJS = crt0.o lib/lcd.o lib/util.o crypt/md2.o simple.o
+_OBJS = crt0.o lib/lcd.o lib/util.o simple.o
 
 # Advanced
 # _OBJS = crt0.o lib/sdcard.o lib/lcd.o lib/soft_impl.o lib/util.o ff14/diskio.o ff14/ff.o main.o
@@ -25,6 +25,8 @@ CFLAGS=-Wall -Iinclude
 OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 
 .PHONY: default deploy build
+
+build: $(ODIR)/a.out
 
 $(ODIR)/crt0.o: crt0.s
 	mkdir -p $(ODIR)
@@ -45,8 +47,6 @@ $(ODIR)/a.out: $(OBJS)
 	$(LLD) -flavor gnu --oformat binary -image-base 0 $^ -o $@
 
 default: deploy
-
-build: $(ODIR)/a.out
 
 deploy: build
 	python2 serial_write.py $(ODIR)/a.out
