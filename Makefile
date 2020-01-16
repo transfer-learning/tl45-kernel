@@ -49,7 +49,7 @@ $(ODIR)/a.out: $(OBJS)
 default: deploy
 
 deploy: build
-	python2 serial_write.py $(ODIR)/a.out
+	python serial_write.py $(ODIR)/a.out
 
 simulate: build
 	hardware-src/verilator/build/sim_tl45_comp $(ODIR)/a.out

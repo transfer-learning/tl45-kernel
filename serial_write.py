@@ -22,7 +22,7 @@ if sys.platform == 'darwin':
     # mac_irl
     serial_ifs = glob.glob('/dev/cu.usbserial*')
 else:
-    serial_ifs = glob.glob('/dev/ttyUSB0')
+    serial_ifs = glob.glob('/dev/ttyUSB*')
 
 if not serial_ifs:
     print('No serial interfaces found!')
@@ -36,104 +36,75 @@ def vprint(*args, **kwargs):
         print(*args, **kwargs)
 
 
-def write_ack(ser, address, data, verify=False):
-    payload = 'A' + hex(address)[2:] + 'W' + hex(data)[2:] + '\n'
-
+def set_base_addr(ser, base):
+    checksum = 0x06
+    checksum += (base & 0xFF) + ((base >> 8) & 0xFF)
+    checksum = (~checksum + 1) & 0xFF
+    payload = ":02000004{:04X}{:02X}".format(base, checksum)
     ser.write(payload.encode('ascii'))
+    response = ser.read(1).decode('ascii')
     vprint(payload)
+    return response == "S"
 
+def write_ack(ser, address, data):
+    assert(len(data) <= 0xFF)
+    base = (address >> 16) & 0xFFFF
+    offset = address & 0xFFFF
+    if not set_base_addr(ser, base):
+        print("FAILED TO SET BASE ADDR")
+        exit(1)
+
+    checksum = len(data)
+    checksum += (offset & 0xFF) + ((offset >> 8) & 0xFF)
+    payload = ":{:02X}{:04X}00".format(len(data), offset)
+    for b in data:
+        checksum += b
+        payload += "{:02X}".format(b)
+    payload += "{:02X}".format((~checksum + 1) & 0XFF)
+    vprint(payload)
+    retry = 0
     while True:
-        response = ser.readline().decode('ascii')
-        vprint(response)
-        if 'K' in response:
-            break
-        if response == '':
-            raise ValueError('didnt ACK')
-    if verify:
-        read_val = read_ack(ser, address)
-        # print(read_val, data)
-        assert read_val == data
+        ser.write(payload.encode('ascii'))
+        response = ser.read(1).decode('ascii')
+        if not response or response == "E":
+            print("try: {} CHECKSUM ERROR at 0x{:08X}\n HEX: {}".format(retry, address, payload))
+            retry += 1
+            time.sleep(.1)
+            continue
+        break
+    return response
+
 
 
 def parsehex(num):
     return int('0x' + num, 16)
 
-
-def read_ack(ser, address):
-    payload = 'A' + hex(address)[2:] + 'R' + '\n'
-
-    ser.write(payload.encode('ascii'))
-    ser.flush()
-    vprint(payload)
-#    time.sleep(0.05)
-
-    while True:
-        response = ser.readline().decode('ascii')
-        vprint(response)
-        if 'R' in response:
-            break
-        if response == '':
-            raise ValueError('didnt get ACK')
-
-    ack_address, junk, mem = response.strip().partition('R')
-    if len(ack_address) != 9:
-        time.sleep(0.5)
-        return read_ack(ser, address)
-
-    return parsehex(mem)
-
-
-def dump_file(ser, filename, base=0, fixes=None, retry=5):
+def dump_file(ser, filename, base=0, chunksize=240):
     prog = open(filename, 'rb').read()
-    fixes = fixes or {}
-    addr = 0
-    for i in range(0, len(prog), 4):
-        print('Writing File {}/{}'.format(i // 4, len(prog) // 4), end='\r')
-        num = struct.unpack('>I', prog[i:i+4])[0]
-        vprint(hex(num))
-        if num in fixes:
-            vprint('fixing:', hex(num), '->', hex(fixes[num]))
-            num = fixes[num]
-
-        for _ in range(retry):
-            try:
-                write_ack(ser, base + addr * 4, num, verify=True)
-                break
-            except AssertionError:
-                print('Write error, retrying')
+    print('FILE SIZE {}, CHUNKSIZE = {}'.format(len(prog), chunksize))
+    for addr in range(0, len(prog), chunksize):
+        if not VERBOSE:
+            print('Writing File {}/{}'.format(addr, len(prog)), end='\r')
+        res = write_ack(ser, base + addr, prog[addr:addr+chunksize])
+        if res == "K":
+            continue
+        elif res == "E":
+            print("CHECKSUM ERROR")
+            exit(1)
         else:
-            raise AssertionError('gave up')
-
-        vprint(hex(read_ack(ser, base + addr * 4)))
-        addr += 1
-
-    for i in range(32):
-        print('Writing Empty buf {}/{}         '.format(i, 32), end='\r')
-        for _ in range(retry):
-            try:
-                write_ack(ser, base + addr * 4, 0, verify=True)
-                break
-            except AssertionError:
-                print('Write error, retrying')
-        else:
-            raise AssertionError('gave up')
-        addr += 1
-
-
-def dump_raw(ser, arr, base=0):
-    for i in range(0, len(arr)):
-        write_ack(ser, base + i * 4, arr[i], verify=True)
+            print("RES = ", res)
+            exit(1)
+    # write_ack(ser, base + addr, [0]*32)
 
 def auto_int(x):
         return int(x, 0)
 
 argp = argparse.ArgumentParser()
-argp.add_argument('--dump', type=int, nargs='?')
 argp.add_argument('--base', type=auto_int, nargs='?', default=0)
 argp.add_argument('file', type=str, nargs='?')
 args = argp.parse_args()
 
-with serial.Serial(serial_ifs[0], 115200, timeout=0.01) as ser:
+with serial.Serial(serial_ifs[0], 115200, timeout=0.1) as ser:
     print('Serial Name:', ser.name)
 
     ser.reset_input_buffer()
@@ -145,33 +116,6 @@ with serial.Serial(serial_ifs[0], 115200, timeout=0.01) as ser:
             break
         print(d)
 
-    # arr = [
-    #     0x0D100000,
-    #     0x0D200001,
-    #     0x0D30000A,
-    #     0x0E500100,
-    #     0x65400034,
-    #     0x08112000,
-    #     0x08420000,
-    #     0x08210000,
-    #     0x08140000,
-    #     0xA9250000,
-    #     0x0D33FFFF,
-    #     0x65F00010,
-    #     0x08402000,
-    #     0x65F00034,
-    # ]
-
-    if args.dump:
-        print('BASE =', hex(args.base))
-        write = open('dump.out', 'wb')
-        for i in range(0, args.dump, 4):
-            val = read_ack(ser, args.base + i)
-            for j in range(3, -1, -1):
-                write.write(struct.pack('B', (val >> (j*8) & 0xFF)))
-        write.flush()
-        exit(0)
-
     if args.file:
         print('Dump file: ', args.file)
         dump_file(ser, args.file)
@@ -180,24 +124,3 @@ with serial.Serial(serial_ifs[0], 115200, timeout=0.01) as ser:
     exit(0)
 
     # dump_file(ser, '/Users/will/Work/transfer-learning/llvm-tl45/llvm/bbb/a.out')
-
-    print('\n')
-    #
-    write_ack(ser, 0, 0xdeadbeef)
-    #
-    print(hex(read_ack(ser, 0)))
-    #
-    for i in range(0, 81920, 4):
-        print("{0:08X}".format(read_ack(ser, i)))
-    write_ack(ser, 512, 0xb0ba)
-    #
-    print(hex(read_ack(ser, 0)))
-
-
-    # for i in range(4, 800, 4):
-    #     write_ack(ser, i, 0xb0ba)
-    #     print(i, hex(read_ack(ser, 0)))
-
-    # for i in range(1000):
-    #     write_ack(ser, 0x1000000, i)
-    #     time.sleep(0.5)
