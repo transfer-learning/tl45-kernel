@@ -9,15 +9,10 @@ CLANG=./toolchain/bin/clang
 # Source Files Configuration. Place all compile targets here. #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-# Basic 
-_OBJS = crt0.o lib/lcd.o lib/util.o simple.o
-
-# Advanced
-# _OBJS = crt0.o lib/sdcard.o lib/lcd.o lib/soft_impl.o lib/util.o ff14/diskio.o ff14/ff.o main.o
-# _OBJS = crt0.o lib/lcd.o lib/soft_impl.o lib/util.o main.o
-# _OBJS = crt0.o lib/soft_impl.o sha1.o
-# _OBJS = crt0.o lib/soft_impl.o scomp.o
-# _OBJS ?= crt0.o lib/soft_impl.o div_test.o
+# Basic
+_CSRCS = $(wildcard src/*.c src/**/*.c)
+_OBJS = crt0.o
+_OBJS += $(patsubst src/%.c, %.o, $(_CSRCS))
 
 ODIR=obj
 CFLAGS=-Wall -Iinclude
@@ -26,30 +21,27 @@ OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 
 .PHONY: default deploy build
 
-build: $(ODIR)/a.out
+build: $(ODIR)/a.bin
 
 $(ODIR)/crt0.o: crt0.s
 	mkdir -p $(ODIR)
 	$(LLVM_MC) --filetype obj -triple=tl45-unknown-unknown $< -o $@
 
-$(ODIR)/testcase.o: testcase.s
-	mkdir -p $(ODIR)
-	$(LLVM_MC) --filetype obj -triple=tl45-unknown-unknown $< -o $@
-
 $(ODIR)/%.o: src/%.c $(DEPS)
-	mkdir -p $(ODIR)/ff14
-	mkdir -p $(ODIR)/lib
-	mkdir -p $(ODIR)/crypt
+	mkdir -p $(@D)
 	$(CLANG) --target=tl45-unknown-none -fintegrated-as -O3 -c $(CFLAGS) $< -o $@
 	$(CLANG) --target=tl45-unknown-none -fintegrated-as -O3 -c $(CFLAGS) $< -S -o $@.s
 
-$(ODIR)/a.out: $(OBJS)
-	$(LLD) -flavor gnu --gc-sections --oformat binary -image-base 0 $^ -o $@
+$(ODIR)/a.elf: $(OBJS)
+	$(LLD) -flavor gnu --gc-sections -T tl45.ld $^ -o $@
+
+$(ODIR)/a.bin: $(ODIR)/a.elf
+	$(OBJCOPY) --only-section=.raw -O binary $^ $@
 
 default: deploy
 
 deploy: build
-	./tl-flash $(ODIR)/a.out
+	./tl-flash $(ODIR)/a.bin
 
 simulate: build
 	hardware-src/verilator/build/sim_tl45_comp $(ODIR)/a.out

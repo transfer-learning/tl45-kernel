@@ -2,7 +2,7 @@
 // Created by Will Gulian on 11/3/19.
 //
 
-#include "hardware.h"
+#include "hardware/peripherals.h"
 #include "util.h"
 
 int lcd_util[] = {0, 0, 0, 0};
