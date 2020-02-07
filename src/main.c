@@ -9,5 +9,6 @@ int main() {
   puts(a);
   puts(b);
   for(;;) {
+    SEG = SWITCHES * SWITCHES;
   }
 }

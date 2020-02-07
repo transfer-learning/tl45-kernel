@@ -5,3 +5,10 @@
 /toolchain
 /obj
 
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+cmake-*/
+tl-flash/
