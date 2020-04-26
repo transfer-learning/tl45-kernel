@@ -10,12 +10,12 @@ CLANG=./toolchain/bin/clang
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Basic
-_CSRCS = $(wildcard src/*.c src/**/*.c)
+_CSRCS = $(wildcard src/*.c src/libc/*.c src/**/*.c)
 _OBJS = crt0.o
 _OBJS += $(patsubst src/%.c, %.o, $(_CSRCS))
 
 ODIR=obj
-CFLAGS=-Wall -Iinclude
+CFLAGS=-Wall -Iinclude -Itl45-libc/include
 
 OBJS = $(patsubst %,$(ODIR)/%,$(_OBJS))
 
@@ -33,7 +33,7 @@ $(ODIR)/%.o: src/%.c $(DEPS)
 	$(CLANG) --target=tl45-unknown-none -fintegrated-as -O3 -c $(CFLAGS) $< -S -o $@.s
 
 $(ODIR)/a.elf: $(OBJS)
-	$(LLD) -flavor gnu --gc-sections -T tl45.ld $^ -o $@
+	$(LLD) -flavor gnu --gc-sections -T tl45.ld tl45-libc/libc.a $^ -o $@
 
 $(ODIR)/a.bin: $(ODIR)/a.elf
 	$(OBJCOPY) --only-section=.raw -O binary $^ $@
