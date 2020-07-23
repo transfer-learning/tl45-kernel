@@ -9,6 +9,7 @@ _start:
     
     .globl halt
 halt:
+    .int 0xffffffff
     jmpi halt
 
     .globl nothing

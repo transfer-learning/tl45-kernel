@@ -44,3 +44,8 @@ di_int __muldi3(di_int a, di_int b) {
   r.s.high += x.s.high * y.s.low + x.s.low * y.s.high;
   return r.all;
 }
+
+si_int __modsi3(si_int a, si_int b)
+{
+    return a - (a/b) * b;
+}
